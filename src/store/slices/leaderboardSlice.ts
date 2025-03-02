@@ -1,6 +1,6 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
-import { db } from '../../firebase';
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { collection, getDocs, limit, orderBy, query } from "firebase/firestore";
+import { db } from "../../firebase";
 
 interface LeaderboardUser {
   userId: string;
@@ -11,18 +11,18 @@ interface LeaderboardUser {
 
 interface LeaderboardState {
   users: LeaderboardUser[];
-  status: 'idle' | 'loading' | 'succeeded' | 'failed';
+  status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
 }
 
 const initialState: LeaderboardState = {
   users: [],
-  status: 'idle',
+  status: "idle",
   error: null,
 };
 
 export const fetchLeaderboard = createAsyncThunk(
-  'leaderboard/fetchLeaderboard',
+  "leaderboard/fetchLeaderboard",
   async (_, { rejectWithValue }) => {
     try {
       // Pobieramy bieżący miesiąc i rok
@@ -32,9 +32,9 @@ export const fetchLeaderboard = createAsyncThunk(
 
       // Tworzymy zapytanie do bazy danych
       const stepsQuery = query(
-        collection(db, 'userSteps'),
-        orderBy('monthlySteps', 'desc'),
-        limit(100)
+        collection(db, "userSteps"),
+        orderBy("monthlySteps", "desc"),
+        limit(100),
       );
 
       const querySnapshot = await getDocs(stepsQuery);
@@ -49,17 +49,17 @@ export const fetchLeaderboard = createAsyncThunk(
         if (stepData.month === currentMonth && stepData.year === currentYear) {
           // Pobieramy dodatkowe dane użytkownika
           try {
-            const userDoc = await getDocs(query(collection(db, 'users')));
-            const userDocs = userDoc.docs.filter(doc => doc.id === stepData.userId);
+            const userDoc = await getDocs(query(collection(db, "users")));
+            const userDocs = userDoc.docs.filter((doc) => doc.id === stepData.userId);
 
             if (userDocs.length > 0) {
               const userData = userDocs[0].data();
 
               leaderboardData.push({
                 userId: stepData.userId,
-                displayName: userData.displayName || 'Anonim',
-                photoURL: userData.photoURL || '',
-                monthlySteps: stepData.monthlySteps
+                displayName: userData.displayName || "Anonim",
+                photoURL: userData.photoURL || "",
+                monthlySteps: stepData.monthlySteps,
               });
             }
           } catch (error) {
@@ -70,27 +70,27 @@ export const fetchLeaderboard = createAsyncThunk(
 
       return leaderboardData;
     } catch (error: any) {
-      return rejectWithValue(error.message || 'Nie udało się pobrać danych tabeli liderów');
+      return rejectWithValue(error.message || "Nie udało się pobrać danych tabeli liderów");
     }
-  }
+  },
 );
 
 const leaderboardSlice = createSlice({
-  name: 'leaderboard',
+  name: "leaderboard",
   initialState,
   reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(fetchLeaderboard.pending, (state) => {
-        state.status = 'loading';
+        state.status = "loading";
       })
       .addCase(fetchLeaderboard.fulfilled, (state, action) => {
-        state.status = 'succeeded';
+        state.status = "succeeded";
         state.users = action.payload;
         state.error = null;
       })
       .addCase(fetchLeaderboard.rejected, (state, action) => {
-        state.status = 'failed';
+        state.status = "failed";
         state.error = action.payload as string;
       });
   },

@@ -1,26 +1,26 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import axios from 'axios';
-import { doc, setDoc } from 'firebase/firestore';
-import { db } from '../../firebase';
-import { RootState } from '../store';
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import axios from "axios";
+import { doc, setDoc } from "firebase/firestore";
+import { db } from "../../firebase";
+import { RootState } from "../store";
 
 interface StepsState {
   monthlySteps: number;
-  status: 'idle' | 'loading' | 'succeeded' | 'failed';
+  status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
   lastUpdate: string | null;
 }
 
 const initialState: StepsState = {
   monthlySteps: 0,
-  status: 'idle',
+  status: "idle",
   error: null,
   lastUpdate: null,
 };
 
 // Funkcja do pobierania kroków z Google Fit API
 export const fetchStepsFromGoogleFit = createAsyncThunk(
-  'steps/fetchFromGoogleFit',
+  "steps/fetchFromGoogleFit",
   async (_, { getState, rejectWithValue }) => {
     try {
       const state = getState() as RootState;
@@ -28,7 +28,7 @@ export const fetchStepsFromGoogleFit = createAsyncThunk(
       const userId = state.user.currentUser?.uid;
 
       if (!token || !userId) {
-        return rejectWithValue('Użytkownik nie jest zalogowany lub brak tokenu');
+        return rejectWithValue("Użytkownik nie jest zalogowany lub brak tokenu");
       }
 
       // Ustawiamy zakres dat na obecny miesiąc
@@ -42,21 +42,22 @@ export const fetchStepsFromGoogleFit = createAsyncThunk(
 
       // Zapytanie do Google Fit API
       const response = await axios.post(
-        'https://www.googleapis.com/fitness/v1/users/me/dataset:aggregate',
+        "https://www.googleapis.com/fitness/v1/users/me/dataset:aggregate",
         {
           aggregateBy: [{
-            dataTypeName: 'com.google.step_count.delta',
-            dataSourceId: 'derived:com.google.step_count.delta:com.google.android.gms:estimated_steps'
+            dataTypeName: "com.google.step_count.delta",
+            dataSourceId:
+              "derived:com.google.step_count.delta:com.google.android.gms:estimated_steps",
           }],
           bucketByTime: { durationMillis: endTime - startTime },
           startTimeMillis: startTime,
-          endTimeMillis: endTime
+          endTimeMillis: endTime,
         },
         {
           headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
+            Authorization: `Bearer ${token}`,
+          },
+        },
       );
 
       // Obliczanie sumy kroków z otrzymanych danych
@@ -72,26 +73,26 @@ export const fetchStepsFromGoogleFit = createAsyncThunk(
 
       // Zapisujemy dane w Firebase
       const lastUpdate = new Date().toISOString();
-      await setDoc(doc(db, 'userSteps', userId), {
+      await setDoc(doc(db, "userSteps", userId), {
         userId,
         monthlySteps: totalSteps,
         year: today.getFullYear(),
         month: today.getMonth() + 1, // Miesiące w JS są 0-indeksowane
-        lastUpdate: lastUpdate
+        lastUpdate: lastUpdate,
       }, { merge: true });
 
       return {
         monthlySteps: totalSteps,
-        lastUpdate
+        lastUpdate,
       };
     } catch (error: any) {
-      return rejectWithValue(error.message || 'Nie udało się pobrać danych o krokach');
+      return rejectWithValue(error.message || "Nie udało się pobrać danych o krokach");
     }
-  }
+  },
 );
 
 const stepsSlice = createSlice({
-  name: 'steps',
+  name: "steps",
   initialState,
   reducers: {
     setSteps: (state, action: PayloadAction<number>) => {
@@ -101,16 +102,16 @@ const stepsSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(fetchStepsFromGoogleFit.pending, (state) => {
-        state.status = 'loading';
+        state.status = "loading";
       })
       .addCase(fetchStepsFromGoogleFit.fulfilled, (state, action) => {
-        state.status = 'succeeded';
+        state.status = "succeeded";
         state.monthlySteps = action.payload.monthlySteps;
         state.lastUpdate = action.payload.lastUpdate;
         state.error = null;
       })
       .addCase(fetchStepsFromGoogleFit.rejected, (state, action) => {
-        state.status = 'failed';
+        state.status = "failed";
         state.error = action.payload as string;
       });
   },

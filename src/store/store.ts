@@ -1,7 +1,7 @@
-import { configureStore } from '@reduxjs/toolkit';
-import userReducer from './slices/userSlice';
-import stepsReducer from './slices/stepsSlice';
-import leaderboardReducer from './slices/leaderboardSlice';
+import { configureStore } from "@reduxjs/toolkit";
+import userReducer from "./slices/userSlice";
+import stepsReducer from "./slices/stepsSlice";
+import leaderboardReducer from "./slices/leaderboardSlice";
 
 export const store = configureStore({
   reducer: {
