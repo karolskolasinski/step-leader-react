@@ -61,7 +61,6 @@ export const fetchMonthlySteps = async (): Promise<StepData[]> => {
   }
 
   const data = await response.json();
-  console.log(data);
   const dailySteps: StepData[] = [];
 
   data.bucket.forEach((bucket: Bucket) => {

@@ -42,34 +42,17 @@ const LandingPage = () => {
     <div>
       <h1>Lider kroków</h1>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Funkcja</th>
-            <th>Opis</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Autentykacja</td>
-            <td>Zaloguj się przez Google</td>
-          </tr>
-          <tr>
-            <td>Dashboard</td>
-            <td>Zobacz swoje dane po zalogowaniu</td>
-          </tr>
-        </tbody>
-      </table>
-
       {topSteps.length > 0 && (
         <div>
-          <h2>Top 100</h2>
           <ol>
             {topSteps.map((top, index) => {
-              console.log(top);
+              const currentMonth = `${new Date().getMonth() + 1}`.padStart(2, "0");
+              const currentYear = new Date().getFullYear();
+              const currentDate = `${currentYear}-${currentMonth}`;
+
               return (
                 <li key={top.id}>
-                  {index + 1}. {top.displayName} - {top.email} - {top.uid}
+                  {index + 1}. {top.displayName} - {top.stepsData[currentDate]}
                 </li>
               );
             })}
