@@ -18,7 +18,7 @@ const LandingPage = () => {
       await signInWithGoogle();
       navigate("/dashboard");
     } catch (error) {
-      console.error("Nie udało się zalogować", error);
+      console.error("sing in with Google error", error);
     }
   };
 

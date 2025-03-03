@@ -8,9 +8,9 @@ interface AuthContextType {
 }
 
 interface User {
-  displayName: string | null;
-  email: string | null;
-  photoURL: string | null;
+  displayName: string;
+  email: string;
+  photoURL: string;
   uid: string;
 }
 
@@ -25,9 +25,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return auth.onAuthStateChanged((user: FirebaseUser | null) => {
       if (user) {
         setCurrentUser({
-          displayName: user.displayName,
-          email: user.email,
-          photoURL: user.photoURL,
+          displayName: user.displayName ?? "",
+          email: user.email ?? "",
+          photoURL: user.photoURL ?? "",
           uid: user.uid,
         });
       } else {

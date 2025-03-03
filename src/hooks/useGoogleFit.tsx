@@ -1,6 +1,14 @@
 import { useEffect, useState } from "react";
-import { fetchMonthlySteps, MonthlyStepData } from "../services/googleFitService";
+import { fetchMonthlySteps, StepData } from "../services/googleFitService";
 import { useAuth } from "../context/AuthContext";
+import { saveStepsData } from "../firebase";
+
+type MonthlyStepData = {
+  totalSteps: number;
+  dailySteps: StepData[];
+  loading: boolean;
+  error: string | null;
+};
 
 export const useGoogleFit = (): MonthlyStepData => {
   const [state, setState] = useState<MonthlyStepData>({
@@ -15,13 +23,25 @@ export const useGoogleFit = (): MonthlyStepData => {
   useEffect(() => {
     const loadStepData = async () => {
       if (!currentUser) {
-        setState((prev) => ({ ...prev, loading: false }));
+        setState((prev) => ({
+          ...prev,
+          loading: false,
+        }));
+
         return;
       }
 
       try {
         const dailySteps = await fetchMonthlySteps();
         const totalSteps = dailySteps.reduce((sum, day) => sum + day.steps, 0);
+
+        if (currentUser.uid) {
+          await saveStepsData(
+            currentUser.uid,
+            currentUser.displayName,
+            totalSteps,
+          );
+        }
 
         setState({
           totalSteps,
@@ -30,12 +50,12 @@ export const useGoogleFit = (): MonthlyStepData => {
           error: null,
         });
       } catch (error) {
-        console.error("Błąd podczas pobierania danych o krokach:", error);
+        console.error("fetching steps error: ", error);
         setState({
           totalSteps: 0,
           dailySteps: [],
           loading: false,
-          error: error instanceof Error ? error.message : "Nieznany błąd",
+          error: error instanceof Error ? error.message : "error",
         });
       }
     };

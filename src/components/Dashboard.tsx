@@ -1,16 +1,16 @@
-import React from "react";
 import { useNavigate } from "react-router-dom";
 import { logoutUser } from "../firebase";
 import { useAuth } from "../context/AuthContext";
 import { useGoogleFit } from "../hooks/useGoogleFit";
+import { useEffect } from "react";
 
-const Dashboard: React.FC = () => {
+const Dashboard = () => {
   const { currentUser, loading: authLoading } = useAuth();
   const { totalSteps, dailySteps, loading: stepsLoading, error } = useGoogleFit();
   const navigate = useNavigate();
 
   // if user is not logged in, redirect him to landing page
-  React.useEffect(() => {
+  useEffect(() => {
     if (!authLoading && !currentUser) {
       navigate("/");
     }
@@ -21,32 +21,35 @@ const Dashboard: React.FC = () => {
     navigate("/");
   };
 
-  if (authLoading) return <div>Ładowanie danych użytkownika...</div>;
-  if (!currentUser) return null;
+  if (authLoading) {
+    return <div>Ładowanie danych użytkownika...</div>;
+  }
+  if (!currentUser) {
+    return null;
+  }
 
   return (
-    <div className="dashboard">
+    <div>
       <h1>Dashboard</h1>
 
-      <div className="user-profile">
+      <div>
         {currentUser.photoURL && (
           <img
             src={currentUser.photoURL}
-            alt="Avatar użytkownika"
-            className="user-avatar"
+            alt={currentUser.displayName}
           />
         )}
         <h2>{currentUser.displayName}</h2>
         <p>{currentUser.email}</p>
       </div>
 
-      <div className="fitness-data">
+      <div>
         <h2>Dane o aktywności w bieżącym miesiącu</h2>
 
         {stepsLoading && <p>Ładowanie danych o krokach...</p>}
 
         {error && (
-          <div className="error-message">
+          <div>
             <p>Wystąpił problem podczas ładowania danych: {error}</p>
             <p>
               Upewnij się, że masz włączoną usługę Google Fit i udzieliłeś odpowiednich uprawnień.
@@ -56,13 +59,13 @@ const Dashboard: React.FC = () => {
 
         {!stepsLoading && !error && (
           <>
-            <div className="steps-summary">
+            <div>
               <h3>Suma kroków w tym miesiącu: {totalSteps}</h3>
             </div>
 
-            <div className="steps-daily">
+            <div>
               <h3>Kroki dzienne:</h3>
-              <table className="steps-table">
+              <table>
                 <thead>
                   <tr>
                     <th>Data</th>
@@ -70,7 +73,7 @@ const Dashboard: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {dailySteps.map((day: any) => (
+                  {dailySteps.map((day) => (
                     <tr key={day.date}>
                       <td>{day.date}</td>
                       <td>{day.steps}</td>
