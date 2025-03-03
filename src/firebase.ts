@@ -1,6 +1,20 @@
 import { initializeApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
-import { getFirestore, doc, setDoc, updateDoc, arrayUnion, getDoc, Timestamp } from 'firebase/firestore';
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
+import {
+  arrayUnion,
+  collection,
+  doc,
+  DocumentData,
+  getDoc,
+  getDocs,
+  getFirestore,
+  limit,
+  orderBy,
+  query,
+  setDoc,
+  Timestamp,
+  updateDoc,
+} from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -11,12 +25,11 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
-
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const googleProvider = new GoogleAuthProvider();
-googleProvider.addScope('https://www.googleapis.com/auth/fitness.activity.read');
+googleProvider.addScope("https://www.googleapis.com/auth/fitness.activity.read");
 
 export const signInWithGoogle = async () => {
   try {
@@ -24,7 +37,7 @@ export const signInWithGoogle = async () => {
     const credential = GoogleAuthProvider.credentialFromResult(result);
 
     if (credential) {
-      localStorage.setItem('googleFitToken', credential.accessToken ?? '');
+      localStorage.setItem("googleFitToken", credential.accessToken ?? "");
     }
 
     if (result.user) {
@@ -40,7 +53,7 @@ export const signInWithGoogle = async () => {
 };
 
 export const logoutUser = () => {
-  localStorage.removeItem('googleFitToken');
+  localStorage.removeItem("googleFitToken");
   return signOut(auth);
 };
 
@@ -52,28 +65,28 @@ export const saveLoginDate = async (userId: string, dateStr: string) => {
     if (userDoc.exists()) {
       const userData = userDoc.data();
       const loginDates = userData.loginDates || [];
-      const todayDate = dateStr.split('T')[0];
-      const dateExists = loginDates.some((date: string) => date.split('T')[0] === todayDate);
+      const todayDate = dateStr.split("T")[0];
+      const dateExists = loginDates.some((date: string) => date.split("T")[0] === todayDate);
 
       if (dateExists) {
         const updatedDates = loginDates.map((date: string) => {
-          if (date.split('T')[0] === todayDate) {
+          if (date.split("T")[0] === todayDate) {
             return dateStr;
           }
           return date;
         });
 
         await updateDoc(userRef, {
-          loginDates: updatedDates
+          loginDates: updatedDates,
         });
       } else {
         await updateDoc(userRef, {
-          loginDates: arrayUnion(dateStr)
+          loginDates: arrayUnion(dateStr),
         });
       }
     } else {
       await setDoc(userRef, {
-        loginDates: [dateStr]
+        loginDates: [dateStr],
       });
     }
   } catch (error) {
@@ -85,7 +98,7 @@ export const saveLoginDate = async (userId: string, dateStr: string) => {
 export const saveStepsData = async (
   userId: string,
   displayName: string | null,
-  monthlySteps: number
+  monthlySteps: number,
 ) => {
   try {
     const userRef = doc(db, "users", userId);
@@ -93,22 +106,22 @@ export const saveStepsData = async (
 
     const currentMonth = new Date().getMonth() + 1;
     const currentYear = new Date().getFullYear();
-    const monthYearKey = `${currentYear}-${currentMonth.toString().padStart(2, '0')}`;
+    const monthYearKey = `${currentYear}-${currentMonth.toString().padStart(2, "0")}`;
 
     if (userDoc.exists()) {
       await updateDoc(userRef, {
         displayName: displayName,
         [`stepsData.${monthYearKey}`]: monthlySteps,
-        lastUpdated: Timestamp.now()
+        lastUpdated: Timestamp.now(),
       });
     } else {
       await setDoc(userRef, {
         displayName: displayName,
         stepsData: {
-          [monthYearKey]: monthlySteps
+          [monthYearKey]: monthlySteps,
         },
         loginDates: [new Date().toISOString()],
-        lastUpdated: Timestamp.now()
+        lastUpdated: Timestamp.now(),
       });
     }
 
@@ -118,5 +131,36 @@ export const saveStepsData = async (
     throw error;
   }
 };
+
+export async function getTopStepsUsers() {
+  const currentDate = new Date();
+  const fullYear = currentDate.getFullYear();
+  const fullMonth = currentDate.getMonth() + 1;
+  const month = String(fullMonth).padStart(2, "0");
+  const currentMonth = `${fullYear}-${month}`;
+
+  try {
+    const usersRef = collection(db, "users");
+    const q = query(
+      usersRef,
+      orderBy(`stepsData.${currentMonth}`, "desc"),
+      limit(100),
+    );
+    const querySnapshot = await getDocs(q);
+
+    const data: Array<{ id: string } & DocumentData> = [];
+    querySnapshot.forEach((doc) =>
+      data.push({
+        id: doc.id,
+        ...doc.data(),
+      })
+    );
+
+    return data;
+  } catch (error) {
+    console.error("get top steps error", error);
+    throw error;
+  }
+}
 
 export { auth, db };

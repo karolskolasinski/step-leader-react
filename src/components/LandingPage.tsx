@@ -1,7 +1,8 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { signInWithGoogle } from "../firebase";
+import { getTopStepsUsers, signInWithGoogle } from "../firebase";
 import { useAuth } from "../context/AuthContext.tsx";
+import { DocumentData } from "firebase/firestore";
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -21,6 +22,21 @@ const LandingPage = () => {
       console.error("sing in with Google error", error);
     }
   };
+
+  const [topSteps, setTopSteps] = useState<DocumentData[]>([]);
+
+  useEffect(() => {
+    const loadTopStepData = async () => {
+      try {
+        const topSteps = await getTopStepsUsers();
+        setTopSteps(topSteps);
+      } catch (error) {
+        console.error("fetching top steps error: ", error);
+      }
+    };
+
+    loadTopStepData();
+  }, [currentUser]);
 
   return (
     <div>
@@ -44,6 +60,22 @@ const LandingPage = () => {
           </tr>
         </tbody>
       </table>
+
+      {topSteps.length > 0 && (
+        <div>
+          <h2>Top 100</h2>
+          <ol>
+            {topSteps.map((top, index) => {
+              console.log(top);
+              return (
+                <li key={top.id}>
+                  {index + 1}. {top.displayName} - {top.email} - {top.uid}
+                </li>
+              );
+            })}
+          </ol>
+        </div>
+      )}
 
       <button onClick={handleLogin}>
         Zaloguj przez Google

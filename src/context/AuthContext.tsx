@@ -2,17 +2,17 @@ import { createContext, ReactNode, useContext, useEffect, useState } from "react
 import { User as FirebaseUser } from "firebase/auth";
 import { auth } from "../firebase";
 
-interface AuthContextType {
+type AuthContextType = {
   currentUser: User | null;
   loading: boolean;
-}
+};
 
-interface User {
+export type User = {
   displayName: string;
   email: string;
   photoURL: string;
   uid: string;
-}
+};
 
 const AuthContext = createContext<AuthContextType>({ currentUser: null, loading: true });
 export const useAuth = () => useContext(AuthContext);

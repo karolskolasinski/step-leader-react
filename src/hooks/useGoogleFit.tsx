@@ -3,15 +3,15 @@ import { fetchMonthlySteps, StepData } from "../services/googleFitService";
 import { useAuth } from "../context/AuthContext";
 import { saveStepsData } from "../firebase";
 
-type MonthlyStepData = {
+export type MonthlySteps = {
   totalSteps: number;
   dailySteps: StepData[];
   loading: boolean;
   error: string | null;
 };
 
-export const useGoogleFit = (): MonthlyStepData => {
-  const [state, setState] = useState<MonthlyStepData>({
+export const useGoogleFit = (): MonthlySteps => {
+  const [monthlySteps, setMonthlySteps] = useState<MonthlySteps>({
     totalSteps: 0,
     dailySteps: [],
     loading: true,
@@ -23,7 +23,7 @@ export const useGoogleFit = (): MonthlyStepData => {
   useEffect(() => {
     const loadStepData = async () => {
       if (!currentUser) {
-        setState((prev) => ({
+        setMonthlySteps((prev) => ({
           ...prev,
           loading: false,
         }));
@@ -43,7 +43,7 @@ export const useGoogleFit = (): MonthlyStepData => {
           );
         }
 
-        setState({
+        setMonthlySteps({
           totalSteps,
           dailySteps,
           loading: false,
@@ -51,7 +51,7 @@ export const useGoogleFit = (): MonthlyStepData => {
         });
       } catch (error) {
         console.error("fetching steps error: ", error);
-        setState({
+        setMonthlySteps({
           totalSteps: 0,
           dailySteps: [],
           loading: false,
@@ -63,5 +63,5 @@ export const useGoogleFit = (): MonthlyStepData => {
     loadStepData();
   }, [currentUser]);
 
-  return state;
+  return monthlySteps;
 };
