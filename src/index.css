@@ -2,6 +2,6 @@
 
 @tailwind utilities;
 
-button {
-    all: revert
+html {
+    scroll-behavior: smooth;
 }
