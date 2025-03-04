@@ -44,15 +44,30 @@ const LandingPage = () => {
       return 0;
     }
 
-    const sortedDates = loginDates.sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
+    const sortedDates = loginDates
+      .map((date) => new Date(date))
+      .sort((a, b) => b.getTime() - a.getTime());
+
     let count = 1;
-    let lastDate = new Date(sortedDates[0]);
+    let lastDate = sortedDates[0];
 
     for (let i = 1; i < sortedDates.length; i++) {
-      const currentDate = new Date(sortedDates[i]);
-      const lastDateTime = lastDate.getTime();
-      const currentDateTime = currentDate.getTime();
-      const diffDays = Math.floor((lastDateTime - currentDateTime) / (1000 * 60 * 60 * 24));
+      const currentDate = sortedDates[i];
+
+      const lastDateOnly = new Date(
+        lastDate.getFullYear(),
+        lastDate.getMonth(),
+        lastDate.getDate(),
+      );
+      const currentDateOnly = new Date(
+        currentDate.getFullYear(),
+        currentDate.getMonth(),
+        currentDate.getDate(),
+      );
+
+      const diffDays = Math.floor(
+        (lastDateOnly.getTime() - currentDateOnly.getTime()) / (1000 * 60 * 60 * 24),
+      );
 
       if (diffDays === 1) {
         count++;
