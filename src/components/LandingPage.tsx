@@ -211,7 +211,7 @@ const LandingPage = () => {
 
         <hr className="my-40 text-gray-200" />
 
-        <div className="grid md:grid-cols-2 gap-14 md:gap-5 my-44">
+        <div className="grid md:grid-cols-2 gap-14 md:gap-5 my-44" id="about">
           <div className="bg-white shadow-xl p-6 text-center rounded-xl">
             <h1 className="font-black text-2xl mb-3 text-darken">
               Twórca
