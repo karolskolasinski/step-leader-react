@@ -195,7 +195,9 @@ const LandingPage = () => {
                     <div className="absolute inset-0 -z-10 bg-[linear-gradient(45deg,transparent_25%,rgba(243,244,246,0.5)_50%,transparent_75%,transparent_100%)] bg-[length:250%_250%] animate-background-shine" />
 
                     <div className="flex gap-2">
-                      <div className="border-r border-gray-300 pr-2">{top.displayName}</div>
+                      <div className="border-r border-gray-300 pr-2 whitespace-nowrap">
+                        {top.displayName}
+                      </div>
                       <div className="whitespace-nowrap" title="Dobra passa">
                         {streakDays}🔥
                       </div>
@@ -396,9 +398,10 @@ const LandingPage = () => {
             <img src={logo} alt="logo" />
 
             <span className="text-sm pl-5 py-2 font-semibold whitespace-nowrap">
-              Step Leader React
+              Step Leader React <span className="text-yellow-500">v1.31</span>
               <br />
-              v1.1
+              <br />
+              <a href="/privacy" className="font-normal">Polityka Prywatności</a>
             </span>
           </div>
 

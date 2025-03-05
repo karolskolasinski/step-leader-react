@@ -3,6 +3,7 @@ import { AuthProvider } from "./context/AuthContext";
 import LandingPage from "./components/LandingPage";
 import Dashboard from "./components/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Privacy from "./components/Privacy.tsx";
 
 function App() {
   return (
@@ -10,6 +11,7 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<LandingPage />} />
+          <Route path="/privacy" element={<Privacy />} />
 
           <Route
             path="/dashboard"
