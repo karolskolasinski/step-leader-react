@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { getTopStepsUsers, signInWithGoogle } from "../firebase";
 import { useAuth } from "../context/AuthContext.tsx";
 import { DocumentData } from "firebase/firestore";
@@ -401,7 +401,9 @@ const LandingPage = () => {
               Step Leader React <span className="text-yellow-500">v1.31</span>
               <br />
               <br />
-              <a href="/privacy" className="font-normal">Polityka Prywatności</a>
+              <Link to="/privacy" className="font-normal">
+                Polityka Prywatności
+              </Link>
             </span>
           </div>
 
