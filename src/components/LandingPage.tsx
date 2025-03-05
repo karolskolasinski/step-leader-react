@@ -5,6 +5,7 @@ import { useAuth } from "../context/AuthContext.tsx";
 import { DocumentData } from "firebase/firestore";
 import hero from "../assets/hero1.png";
 import logo from "../assets/logo.png";
+import v3 from "../assets/v3.png";
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -86,6 +87,8 @@ const LandingPage = () => {
   const currentMonthName = new Date().toLocaleString("pl-PL", { month: "long" });
   const currentYear = new Date().getFullYear();
   const currentDate = `${currentYear}-${currentMonth}`;
+  const currentMonthSteps = topSteps.map((t) => t.stepsData[currentDate]);
+  const maxSteps = Math.max(...currentMonthSteps);
 
   return (
     <div className="antialiased">
@@ -115,9 +118,9 @@ const LandingPage = () => {
 
             <a
               className="px-4 py-2 mt-2 text-sm bg-transparent rounded-lg md:ml-4 hover:text-gray-900 focus:outline-none focus:shadow-outline"
-              href="#"
+              href="#about"
             >
-              Kontakt
+              O Twórcy
             </a>
 
             <a
@@ -170,7 +173,7 @@ const LandingPage = () => {
 
       <div className="container px-4 lg:px-8 mx-auto max-w-screen-xl text-gray-700 overflow-x-hidden">
         <div className="mx-auto text-center mt-24">
-          <h1 className="font-bold text-black my-3 text-2xl">
+          <h1 className="font-bold text-black my-3 text-2xl pb-12">
             Lista <span className="text-yellow-500" id="list">100 najlepszych</span>{" "}
             <span className="text-black">({currentMonthName} {new Date().getFullYear()})</span>
           </h1>
@@ -179,18 +182,26 @@ const LandingPage = () => {
             <>
               {topSteps.map((top) => {
                 const streakDays = countStreakDays(top.loginDates);
+                const topSteps = top.stepsData[currentDate];
+                const topWidth = (topSteps / maxSteps) * 100;
+                const topWidthPercent = `${topWidth}%`;
 
                 return (
                   <div
                     key={top.id}
-                    className="w-[100%] border border-gray-300 p-2 rounded-xl flex gap-2 items-center text-3xl font-black justify-between"
+                    style={{ width: topWidthPercent }}
+                    className="border border-gray-300 p-2 rounded-xl flex gap-2 items-center text-2xl font-black justify-between mb-4 relative"
                   >
+                    <div className="absolute inset-0 -z-10 bg-[linear-gradient(45deg,transparent_25%,rgba(243,244,246,0.5)_50%,transparent_75%,transparent_100%)] bg-[length:250%_250%] animate-background-shine" />
+
                     <div className="flex gap-2">
                       <div className="border-r border-gray-300 pr-2">{top.displayName}</div>
-                      <div className="whitespace-nowrap">{streakDays}🔥</div>
+                      <div className="whitespace-nowrap" title="Dobra passa">
+                        {streakDays}🔥
+                      </div>
                     </div>
 
-                    <div>{top.stepsData[currentDate]}</div>
+                    <div>{topSteps}</div>
                   </div>
                 );
               })}
@@ -202,21 +213,179 @@ const LandingPage = () => {
 
         <div className="grid md:grid-cols-2 gap-14 md:gap-5 my-44">
           <div className="bg-white shadow-xl p-6 text-center rounded-xl">
-            <h1 className="font-medium text-xl mb-3 lg:px-14 text-darken">
-              About
+            <h1 className="font-black text-2xl mb-3 text-darken">
+              Twórca
             </h1>
-            <p className="px-4 text-gray-500">
-              my bio
-            </p>
+
+            <div className="flex flex-col items-center sm:flex-row gap-8 pt-4">
+              <div className="w-36">
+                <img src={v3} alt="creator" className="rounded-full" />
+              </div>
+
+              <div className="flex flex-col gap-4">
+                <strong className="text-gray-600 text-left">
+                  Karol Skolasiński
+                </strong>
+
+                <div className="flex gap-2 items-center">
+                  <a href="https://www.linkedin.com/in/karolskolasinski/">
+                    <img
+                      src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/linkedin/linkedin-original.svg"
+                      alt="linkedin"
+                      className="min-w-12 hover:opacity-80"
+                    />
+                  </a>
+
+                  <div className="flex flex-col">
+                    <div className=" text-left text-black text-xl font-black">linkedin</div>
+                    <div className="text-sm text-gray-500">/karolskolasinski</div>
+                  </div>
+                </div>
+
+                <div className="flex gap-2 items-center">
+                  <a href="https://github.com/karolskolasinski/">
+                    <img
+                      src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/github/github-original.svg"
+                      alt="github"
+                      className="min-w-12 hover:opacity-80"
+                    />
+                  </a>
+
+                  <div className="flex flex-col">
+                    <div className=" text-left text-black text-xl font-black">github</div>
+                    <div className="text-sm text-gray-500">/karolskolasinski</div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div className="bg-white shadow-xl p-6 text-center rounded-xl">
-            <h1 className="font-medium text-xl mb-3 lg:px-14 text-darken">
-              Stack
+            <h1 className="font-black text-2xl mb-3 text-darken">
+              Technologie
             </h1>
-            <p className="px-4 text-gray-500">
-              frameworks, tools
-            </p>
+
+            <div className="pt-4 flex flex-col sm:grid sm:grid-cols-2 xl:grid-cols-3 gap-8">
+              <div className="flex gap-2 items-center">
+                <a href="#">
+                  <img
+                    src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/react/react-original.svg"
+                    alt="react"
+                    className="min-w-12 hover:opacity-80"
+                  />
+                </a>
+
+                <div className="flex flex-col text-left">
+                  <div className=" text-black text-xl font-black">React</div>
+                  <div className="text-sm text-gray-500">19.0.0</div>
+                </div>
+              </div>
+
+              <div className="flex gap-2 items-center">
+                <a href="#">
+                  <img
+                    src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/vitejs/vitejs-original.svg"
+                    alt="vite"
+                    className="min-w-12 hover:opacity-80"
+                  />
+                </a>
+
+                <div className="flex flex-col text-left">
+                  <div className=" text-black text-xl font-black">Vite</div>
+                  <div className="text-sm text-gray-500">6.2.0</div>
+                </div>
+              </div>
+
+              <div className="flex gap-2 items-center">
+                <a href="#">
+                  <img
+                    src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/typescript/typescript-original.svg"
+                    alt="typescript"
+                    className="min-w-12 hover:opacity-80"
+                  />
+                </a>
+
+                <div className="flex flex-col text-left">
+                  <div className=" text-black text-xl font-black">Typescript</div>
+                  <div className="text-sm text-gray-500">5.7.2</div>
+                </div>
+              </div>
+
+              <div className="flex gap-2 items-center">
+                <a href="#">
+                  <img
+                    src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/eslint/eslint-original.svg"
+                    alt="eslint"
+                    className="min-w-12 hover:opacity-80"
+                  />
+                </a>
+
+                <div className="flex flex-col text-left">
+                  <div className=" text-black text-xl font-black">eslint</div>
+                  <div className="text-sm text-gray-500">9.21.0</div>
+                </div>
+              </div>
+
+              <div className="flex gap-2 items-center">
+                <a href="#">
+                  <img
+                    src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/tailwindcss/tailwindcss-original.svg"
+                    alt="tailwind"
+                    className="min-w-12 hover:opacity-80"
+                  />
+                </a>
+
+                <div className="flex flex-col text-left">
+                  <div className=" text-black text-xl font-black">Tailwind</div>
+                  <div className="text-sm text-gray-500">4.0.9</div>
+                </div>
+              </div>
+
+              <div className="flex gap-2 items-center">
+                <a href="#">
+                  <img
+                    src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/firebase/firebase-original.svg"
+                    alt="firebase"
+                    className="min-w-12 hover:opacity-80"
+                  />
+                </a>
+
+                <div className="flex flex-col text-left">
+                  <div className=" text-black text-xl font-black">Firebase</div>
+                  <div className="text-sm text-gray-500">11.4.0</div>
+                </div>
+              </div>
+
+              <div className="flex gap-2 items-center">
+                <a href="#">
+                  <img
+                    src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/google/google-original.svg"
+                    alt="google"
+                    className="min-w-12 hover:opacity-80"
+                  />
+                </a>
+
+                <div className="flex flex-col text-left">
+                  <div className=" text-black text-xl font-black">Google</div>
+                  <div className="text-sm text-gray-500">Cloud API</div>
+                </div>
+              </div>
+
+              <div className="flex gap-2 items-center">
+                <a href="#">
+                  <img
+                    src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/netlify/netlify-original.svg"
+                    alt="netlify"
+                    className="min-w-12 hover:opacity-80"
+                  />
+                </a>
+
+                <div className="flex flex-col text-left">
+                  <div className=" text-black text-xl font-black">Netlify</div>
+                  <div className="text-sm text-gray-500">Deploy</div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -229,7 +398,7 @@ const LandingPage = () => {
             <span className="text-sm pl-5 py-2 font-semibold whitespace-nowrap">
               Step Leader React
               <br />
-              v1.0
+              v1.1
             </span>
           </div>
 
