@@ -3,6 +3,7 @@ import { logoutUser } from "../firebase";
 import { useAuth } from "../context/AuthContext";
 import { useGoogleFit } from "../hooks/useGoogleFit";
 import { useEffect } from "react";
+import { Button } from "@mui/material";
 
 const Dashboard = () => {
   const { currentUser, loading: authLoading } = useAuth();
@@ -86,7 +87,7 @@ const Dashboard = () => {
         )}
       </div>
 
-      <button onClick={handleLogout}>Wyloguj się</button>
+      <Button variant="outlined" onClick={handleLogout}>Wyloguj się</Button>
     </div>
   );
 };
